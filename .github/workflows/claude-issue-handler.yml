@@ -1,0 +1,32 @@
+name: Claude Issue Handler
+
+on:
+  issues:
+    types: [labeled, opened]
+
+jobs:
+  handle-claude-issue:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'claude')
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --save-dev @anthropic-ai/sdk
+
+      - name: Run Claude handler
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          REPO: ${{ github.repository }}
+        run: node .github/handlers/claude-issue-handler.js
