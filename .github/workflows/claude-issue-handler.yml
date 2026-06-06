@@ -9,7 +9,9 @@ on:
 jobs:
   handle-claude-issue:
     runs-on: ubuntu-latest
-    if: contains(github.event.issue.labels.*.name, 'claude')
+    if: |
+      github.event_name == 'issues' ||
+      (github.event_name == 'issue_comment' && contains(github.event.issue.labels.*.name, 'claude'))
 
     steps:
       - name: Checkout repo
