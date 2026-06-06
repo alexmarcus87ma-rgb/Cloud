@@ -11,39 +11,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Debug - Print event info
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "Issue number: ${{ github.event.issue.number }}"
-          echo "Issue title: ${{ github.event.issue.title }}"
-          echo "Issue labels: ${{ github.event.issue.labels }}"
-          echo "Comment body: ${{ github.event.comment.body }}"
-
-      - name: Check if Claude label exists
-        id: check_label
-        run: |
-          if echo "${{ github.event.issue.labels }}" | grep -q "claude"; then
-            echo "has_claude_label=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_claude_label=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Checkout repo
-        if: steps.check_label.outputs.has_claude_label == 'true'
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        if: steps.check_label.outputs.has_claude_label == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install dependencies
-        if: steps.check_label.outputs.has_claude_label == 'true'
         run: npm install --save-dev @anthropic-ai/sdk
 
+      - name: Debug - Print event info
+        run: |
+          echo "=== GITHUB EVENT DEBUG ==="
+          echo "Event name: ${{ github.event_name }}"
+          echo "Issue number: ${{ github.event.issue.number }}"
+          echo "Issue title: ${{ github.event.issue.title }}"
+          echo "Issue labels JSON: ${{ toJson(github.event.issue.labels) }}"
+          echo "Comment body: ${{ github.event.comment.body }}"
+          echo "========================="
+
       - name: Run Claude handler
-        if: steps.check_label.outputs.has_claude_label == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
