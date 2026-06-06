@@ -52,7 +52,7 @@ Format as markdown.
   console.log("\n🤖 Claude Analysis:\n", analysis);
 
   // Post comment on issue
-  const commentBody = `## 🤖 Claude Analysis
+  const responseBody = `## 🤖 Claude Analysis
 
 ${analysis}
 
@@ -87,7 +87,7 @@ ${analysis}
     });
 
     req.on("error", reject);
-    req.write(JSON.stringify({ body: commentBody }));
+    req.write(JSON.stringify({ body: responseBody }));
     req.end();
   });
 }
