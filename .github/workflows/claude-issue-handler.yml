@@ -3,6 +3,8 @@ name: Claude Issue Handler
 on:
   issues:
     types: [labeled, opened]
+  issue_comment:
+    types: [created]
 
 jobs:
   handle-claude-issue:
@@ -28,5 +30,7 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
           REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
         run: node .github/handlers/claude-issue-handler.js

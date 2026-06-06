@@ -11,10 +11,16 @@ async function handleIssue() {
   const issueNumber = process.env.ISSUE_NUMBER;
   const issueTitle = process.env.ISSUE_TITLE;
   const issueBody = process.env.ISSUE_BODY || "";
+  const commentBody = process.env.COMMENT_BODY || "";
   const repo = process.env.REPO;
   const githubToken = process.env.GITHUB_TOKEN;
+  const eventName = process.env.EVENT_NAME || "issue";
 
   console.log(`\n📋 Issue #${issueNumber}: ${issueTitle}`);
+  console.log(`📌 Event: ${eventName}`);
+
+  // Determine content to analyze
+  const contentToAnalyze = eventName === "issue_comment" ? commentBody : issueBody;
 
   // Call Claude API
   const message = await client.messages.create({
@@ -24,17 +30,17 @@ async function handleIssue() {
       {
         role: "user",
         content: `
-You are a helpful developer assistant. Analyze this GitHub issue and provide a concise action plan.
+You are a helpful developer assistant. Analyze this GitHub issue request and provide a concise response or action plan.
 
 Issue #${issueNumber}: ${issueTitle}
 
-Body:
-${issueBody}
+Request:
+${contentToAnalyze}
 
 Provide:
-1. Brief summary of the issue
-2. Suggested approach / steps to fix
-3. Estimated effort (small/medium/large)
+1. Brief summary
+2. Suggested approach / solution
+3. Any relevant details or next steps
 
 Format as markdown.
         `,
